@@ -1,5 +1,6 @@
 package me.nickcruz.notes.view.camera.delegates
 
+import android.support.design.widget.FloatingActionButton
 import android.view.View
 import io.fotoapparat.photo.BitmapPhoto
 import kotlinx.android.synthetic.main.activity_camera.*
@@ -46,19 +47,25 @@ class PreviewDelegate(private val cameraActivity: CameraActivity) {
     private fun togglePreview(showPreview: Boolean) {
         with(cameraActivity) {
             if (showPreview) {
-                cameraLayout.visibility = View.GONE
-
+                cameraView.visibility = View.GONE
                 previewView.visibility = View.VISIBLE
-                closePreviewView.visibility = View.VISIBLE
-                savePreviewView.show()
-            } else {
-                cameraLayout.visibility = View.VISIBLE
 
+                shutterView.toggleTo(savePreviewView)
+            } else {
+                cameraView.visibility = View.VISIBLE
                 previewView.visibility = View.GONE
-                closePreviewView.visibility = View.GONE
-                savePreviewView.hide()
+
+                savePreviewView.toggleTo(shutterView)
             }
         }
         showingPreview = showPreview
+    }
+
+    fun FloatingActionButton.toggleTo(thenShow: FloatingActionButton) {
+        hide(object : FloatingActionButton.OnVisibilityChangedListener() {
+            override fun onHidden(fab: FloatingActionButton?) {
+                thenShow.show()
+            }
+        })
     }
 }

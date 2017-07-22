@@ -73,7 +73,6 @@ class CameraDelegate(private val activity: LifecycleActivity) : LifecycleObserve
      * Takes a picture. When the bitmap photo is available, this emits a Single of a [BitmapPhoto].
      */
     fun takePicture(): Single<BitmapPhoto> {
-//                .saveToFile(File(activity.getExternalFilesDir(PHOTO_DIR_LOCATION), "${DateTime.now()}.jpg"))
         return Single.create<BitmapPhoto> { observer ->
             camera.takePicture()
                     .toBitmap()
@@ -93,7 +92,7 @@ class CameraDelegate(private val activity: LifecycleActivity) : LifecycleObserve
         return Fotoapparat
                 .with(activity)
                 .into(cameraView)
-                .previewScaleType(ScaleType.CENTER_CROP)
+                .previewScaleType(ScaleType.CENTER_INSIDE)
                 .photoSize(AspectRatioSelectors.standardRatio(SizeSelectors.biggestSize()))
                 .lensPosition(LensPositionSelectors.lensPosition(LensPosition.BACK))
                 .focusMode(Selectors.firstAvailable(
