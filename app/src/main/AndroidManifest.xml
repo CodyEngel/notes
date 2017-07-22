@@ -18,6 +18,7 @@
         android:label="@string/title_activity_note" />
     <activity
         android:name=".view.camera.CameraActivity"
+        android:theme="@style/AppTheme.NoActionBar"
         android:label="@string/title_activity_camera"/>
 </application>
 </manifest>

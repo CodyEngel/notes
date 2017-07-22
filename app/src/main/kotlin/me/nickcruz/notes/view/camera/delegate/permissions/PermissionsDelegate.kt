@@ -1,4 +1,4 @@
-package me.nickcruz.notes.view.camera.permissions
+package me.nickcruz.notes.view.camera.delegate.permissions
 
 import android.Manifest
 import android.app.Activity

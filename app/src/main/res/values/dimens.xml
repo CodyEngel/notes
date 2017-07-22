@@ -6,4 +6,5 @@
 
     <dimen name="space">8dp</dimen>
     <dimen name="space_x2">16dp</dimen>
+    <dimen name="space_x4">32dp</dimen>
 </resources>
