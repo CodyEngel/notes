@@ -1,12 +1,10 @@
 package me.nickcruz.notes.view.note
 
-import android.arch.lifecycle.LifecycleActivity
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
 import butterknife.ButterKnife
 import butterknife.OnClick
@@ -17,14 +15,14 @@ import kotlinx.android.synthetic.main.activity_note.*
 import kotlinx.android.synthetic.main.content_note.*
 import me.nickcruz.notes.R
 import me.nickcruz.notes.model.Note
-import me.nickcruz.notes.view.attachToLifecycle
+import me.nickcruz.notes.view.base.BaseActivity
 import me.nickcruz.notes.view.camera.CameraActivity
 import me.nickcruz.notes.viewmodel.note.NoteViewModel
 
 /**
  * Created by Nick Cruz on 6/13/17
  */
-class NoteActivity : LifecycleActivity() {
+class NoteActivity : BaseActivity() {
 
     companion object {
         val EXTRA_NOTE = "note"
@@ -53,7 +51,7 @@ class NoteActivity : LifecycleActivity() {
         noteViewModel
                 .subscribeToChanges(titleEditText.textChanges(), contentEditText.textChanges())
                 .subscribe()
-                .attachToLifecycle(this)
+                .attachToLifecycle()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -78,7 +76,7 @@ class NoteActivity : LifecycleActivity() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe { finish() }
-                .attachToLifecycle(this)
+                .attachToLifecycle()
     }
 
     private fun goToCamera() =

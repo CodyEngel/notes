@@ -6,4 +6,5 @@
 
     <color name="half_black">#808080</color>
     <color name="grey_400">#BDBDBD</color>
+    <color name="transparent_grey">#bbffffff</color>
 </resources>

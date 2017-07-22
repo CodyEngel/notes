@@ -1,4 +1,4 @@
-package me.nickcruz.notes.view.camera.delegate
+package me.nickcruz.notes.view.camera.delegates
 
 import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleActivity
@@ -9,12 +9,10 @@ import io.fotoapparat.Fotoapparat
 import io.fotoapparat.parameter.LensPosition
 import io.fotoapparat.parameter.ScaleType
 import io.fotoapparat.parameter.selector.*
+import io.fotoapparat.photo.BitmapPhoto
 import io.fotoapparat.view.CameraView
-import io.reactivex.Completable
+import io.reactivex.Single
 import kotlinx.android.synthetic.main.activity_camera.*
-import me.nickcruz.notes.view.camera.delegate.permissions.PermissionsDelegate
-import org.joda.time.DateTime
-import java.io.File
 
 /**
  * A CameraDelegate handles preparing and setting up a camera. It also manages its own lifecycle
@@ -28,7 +26,7 @@ class CameraDelegate(private val activity: LifecycleActivity) : LifecycleObserve
 
     val permissionsDelegate = PermissionsDelegate(activity)
     var hasCameraPermission = false
-    lateinit var fotoapparat: Fotoapparat
+    lateinit var camera: Fotoapparat
     lateinit var cameraView: CameraView
 
     companion object {
@@ -40,7 +38,7 @@ class CameraDelegate(private val activity: LifecycleActivity) : LifecycleObserve
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    fun prepareCamera() {
+    fun onCreate() {
         cameraView = activity.cameraView
         hasCameraPermission = permissionsDelegate.hasCameraPermission()
 
@@ -50,43 +48,48 @@ class CameraDelegate(private val activity: LifecycleActivity) : LifecycleObserve
             permissionsDelegate.requestCameraPermission()
         }
 
-        fotoapparat = createFotoapparat()
+        camera = prepareCamera()
         cameraView.setOnLongClickListener {
-            fotoapparat.autoFocus()
+            camera.autoFocus()
             true
         }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    fun startCamera() {
+    fun onStart() {
         if (hasCameraPermission) {
-            fotoapparat.start()
+            camera.start()
         }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    fun stopCamera() {
+    fun onStop() {
         if (hasCameraPermission) {
-            fotoapparat.stop()
+            camera.stop()
         }
     }
 
-    fun takePicture() {
-        val photoResult = fotoapparat.takePicture()
-        val photoName = "${DateTime.now()}.jpg"
-
-        photoResult?.saveToFile(File(activity.getExternalFilesDir(PHOTO_DIR_LOCATION), photoName))
+    /**
+     * Takes a picture. When the bitmap photo is available, this emits a Single of a [BitmapPhoto].
+     */
+    fun takePicture(): Single<BitmapPhoto> {
+//                .saveToFile(File(activity.getExternalFilesDir(PHOTO_DIR_LOCATION), "${DateTime.now()}.jpg"))
+        return Single.create<BitmapPhoto> { observer ->
+            camera.takePicture()
+                    .toBitmap()
+                    .whenAvailable { observer.onSuccess(it) }
+        }
     }
 
     fun resultGranted(requestCode: Int,
                       permissions: Array<String>,
                       grantResults: IntArray) {
         if (permissionsDelegate.resultGranted(requestCode, permissions, grantResults)) {
-            fotoapparat.start()
+            camera.start()
         }
     }
 
-    private fun createFotoapparat(): Fotoapparat {
+    private fun prepareCamera(): Fotoapparat {
         return Fotoapparat
                 .with(activity)
                 .into(cameraView)
